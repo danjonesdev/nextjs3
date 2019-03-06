@@ -1,6 +1,6 @@
 {
+  "version": 2,
   "name": "nextjs2",
-  "type": "npm",
   "env": {
     "NODE_ENV": "production",
     "PORT": "3000"
