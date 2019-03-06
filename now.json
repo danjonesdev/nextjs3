@@ -1,6 +1,6 @@
 {
     "version": 2,
-    "name": "nextjs2",
+    "name": "prismic-nextjs-sample",
     "builds": [
         { "src": "next.config.js", "use": "@now/next" }
     ],
