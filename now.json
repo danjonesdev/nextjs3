@@ -1,8 +1,12 @@
 {
-  "version": 2,
-  "name": "nextjs2",
-  "env": {
-    "NODE_ENV": "production",
-    "PORT": "3000"
-  }
+    "version": 2,
+    "name": "nextjs2",
+    "builds": [
+        { "src": "next.config.js", "use": "@now/next" }
+    ],
+    "routes": [
+        {"src": "^/products/(?<id>[^/]*)", "dest": "/product?uid=$id"},
+        {"src": "/blog", "dest": "/bloghome"},
+        {"src": "^/blog/(?<id>[^/]*)", "dest": "/blogpost?uid=$id"}
+    ]
 }
