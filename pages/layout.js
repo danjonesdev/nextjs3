@@ -27,6 +27,7 @@ export default class extends React.Component {
       <Head className={this.props.className}>
         <title>{RichText.asText(this.props && this.props.title || 'Not Found')}</title>
         <meta name="description" content={RichText.asText(this.props && this.props.description || '')} />
+        <meta name="og:description" content={RichText.asText(this.props && this.props.description || '')} />
         <meta charSet="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="theme-color" content="#000000" />
