@@ -28,7 +28,7 @@ export default class extends React.Component {
 
   renderBody() {
     return (
-      <Layout title={this.props.blogpost.data.meta_title} description={this.props.blogpost.data.meta_description} layout={this.props.layout}>
+      <Layout title={this.props.blogpost.data.author.data.name} description={this.props.blogpost.data.meta_description} layout={this.props.layout}>
         <div className="l-wrapper">
           <hr className="separator-hr" />
         </div>
