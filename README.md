@@ -1,265 +1,264 @@
-<p align="center">
-<img src="https://raw.githubusercontent.com/MustansirZia/next-express-bootstrap-boilerplate/master/logo.png" />
-<h1 align="center"> next-express-bootstrap-boilerplate </h1>
-</p>
-<p align="center">
-<a href="https://badge.fury.io/js/next-express-bootstrap-boilerplate"><img src="https://badge.fury.io/js/next-express-bootstrap-boilerplate.svg"/></a>
-<a href="https://www.npmjs.com/package/next-express-bootstrap-boilerplate"><img src="https://img.shields.io/npm/dt/next-express-bootstrap-boilerplate.svg" /></a>
-<a href="https://opensource.org/licenses/mit-license.php"><img src="https://badges.frapsoft.com/os/mit/mit.svg?v=103"/>
-</a>
+# Integrate Prismic, an API-based CMS, in your Next.js application.
 
-</p>
+We are going to explore how to integrate Prismic in a Next.js application  step by step.
+For this tutorial, we'll consider that you're starting from a simple Next.js application without a specific server configuration and a simple routing based on the `pages` folder.
+All the examples below come from this sample.
+Don't hesitate to go through the code to put these example in context.
 
-## Contents
+So lets dive right into it!
 
-- [TL;DR.](#TL;DR)
-- [Installation.](#installation)
-- [App structure.](#app-structure)
-- [Express integration.](#express-integration)
-- [Goodies.](#goodies)
-- [Compatibility, Further reading, Contributions, LICENSE.](#compatibility)
-<br />
+## Table of content
 
-## TL;DR.
-Boilerplate code to get you up and running quickly with a full stack JavaScript web application whose frontend is built with <b>[React.js](https://reactjs.org/)</b>, <b>[Next.js](https://github.com/zeit/next.js)</b>, <b>[Bootstrap](https://react-bootstrap.github.io/)</b> and <b>[SCSS](http://sass-lang.com/)</b> and backend is built using <b>[Express.js](https://expressjs.com/)</b>. React code is isomorphic and the components are rendered both on the server with <b>Server Side Rendering</b> (SSR) as well as on the browser.
-<br />
-<br />
+ - [Installation](#installation)
+ - [Configuration to connect to Prismic](#configuration-to-connect-to-prismic)
+ - [How to create a Prismic client](#how-to-create-a-prismic-client)
+	 - [A client for server side rendering](#a-client-for-server-side-rendering)
+ - [Link Resolving](#link-resolving)
+ - [How to manage a dynamic routing](#how-to-manage-a-dynamic-routing)
+	 - [Build your router](#build-your-router)
+	 - [Build your server](#build-your-server)
+	 - [Update your build configuration](#update-your-build-configuration)
+	 - [How to use a dynamic route parameter in a component](#How-to-use-a-dynamic-route-parameter-in-a-component)
+ - [How to query your content from Prismic](#how-to-query-your-content-from-prismic)
+ - [How to integrate your content in your templates](#how-to-integrate-your-content-in-your-templates)
+ - [Setup the Prismic preview](#setup-the-prismic-preview)
+ - [Want more?](#want-more)
 
-## Installation.
-• `sudo npm i -g next-express-bootstrap-boilerplate`.<br />
 
-• `next-boilerplate` to initialize a project in the current directory or
-`next-boilerplate $FOLDER_NAME`. <br />
+## Installation
 
-• If `$FOLDER_NAME` given, cd into that folder. <br />
-
-• `npm run dev` or `yarn dev`. (For development) <br />
-
-• `npm start` or `yarn start`. (For production) | `start` script will first build the app and then serve the production version at `:9001`.
-
-• Go to `localhost:9001` to verify. <br />
-
-• Start coding! :)
-
-#### • Alternate installation.
-• First clone the repo. `git clone https://github.com/MustansirZia/next-express-bootstrap-boilerplate`.
-
-• `cd next-express-bootstrap-boilerplate`.
-
-• `rm -rf .git`.
-
-• `npm i` or `yarn`.
-
-<br />
-<br />
-
-## App structure.
+Install `prismic-javascript` to make queries.
+```shell
+npm install --save prismic-javascript@2.0.0-beta.0
 ```
-|-- app 	// Next.js app lives here.
-|  |
-|  `-- components 	// Common components live here.
-|  |  |
-|  |  `-- Theme.js
-|  |
-|  `-- pages  // App routes live here.
-|  |  |
-|  |  `-- index.js
-|  |  |
-|  |  `-- profile.js
-|  |
-|  `-- styles   // CSS and SCSS files live here.
-|  |  |
-|  |  `-- index.scss
-|  |  |
-|  |  `-- vendor
-|  |     |
-|  |     `-- bootstrap.min.css
-|  |
-|  `-- .babelrc					
-|  |
-|  `-- next.config.js 	// App config lives here.
-|  |
-|  `-- postcss.config.js   
-|
-|
-`-- public    // Static assets can live here.
-|  |
-|  `-- icons
-|     |
-|     `-- github.png         
-|
-|
-`-- app.js
-|
-`-- next.js
-|
-`-- package.json
-|
-`-- README.md
-|
-`-- LICENSE
+Install `prismic-reactjs` to quickly render structured content from Prismic API.
+```shell
+npm install --save prismic-reactjs
+```
+Install `express` to build a server and use its embedded url matching system.
+```shell
+npm install --save express
+```
+Install `next-routes` to build a router.
+```shell
+npm install --save next-routes
 ```
 
+## How to connect to your Prismic API
+Prismic offers an API which you can contact by specifying an endpoint but also an access token if you want your API to be private.
+We'll create a configuration file to declare these:
 
-Our React app is housed under `app/`. Since it uses Next.js, all the main app routes go under `app/pages`. The common or miscellaneous components are housed under `app/components`.
-<br />
+**Configuration:**
 
-Next.js uses [styled-jsx](https://github.com/zeit/styled-jsx) to apply styles to our components. It is a css-in-js solution and will work inside this boilerplate too. But apart from this, we can write our own individual `css` or `scss` files for each of our components and place them under `app/styles`.
-We can later on import these style files just as we do in plain react but we need to put them inside `<style>` tags for them to work. (Since that's how Next.js handles all the styling).
-<br />
-
-As you can see our `bootstrap.min.css` is also housed under `app/styles/vendor` and is loaded inside a HOC called `Theme`. We essentially load all the bootstrap styling into this component and make it a wrapper for every component which uses components from <b>[react-bootstrap](https://react-bootstrap.github.io/)</b>. That's how we can import and use bootstrap components into our own components. Check `app/pages/index.js` as an example for this.
-
-
-#### • How it works?
-Our `css` and `scss` files are essentially transpiled to css-in-js during runtime and loaded or hot loaded into our app by a recipe that I got from [here](https://github.com/zeit/next.js/tree/master/examples/with-global-stylesheet). That's what the `app/.babelrc`, `app/postcss.config.js` and the webpack config inside `app/next.config.js` are for.
-
-#### `app/pages/index.js`.
-```jsx
-import Link from 'next/link';
-import { Button } from 'react-bootstrap';
-import Theme from '../components/Theme';
-
-// Straight away require/import scss/css just like in react.
-import indexStyle from '../styles/index.scss';
-
-const Index = () => (
-    // Wrap your page inside <Theme> HOC to get bootstrap styling.
-    // Theme can also be omitted if react-bootstrap components are not used.
-    <Theme>
-        {
-            /*
-            Set indexStyling via dangerouslySetInnerHTML.
-            This step will make the below classes to work.
-            */
-        }
-        <style dangerouslySetInnerHTML={{ __html: indexStyle }} />
-
-        <span className="heading">React.js | Next.js | Express.js | Bootstrap - SCSS</span>
-        <span className="text">with SSR.</span>
-
-        {/* Acquire static assets from express static directly. */}
-        <div className="img-container">
-            <img alt="" src="/icons/github.png" />
-        </div>
-
-        <span className="text">
-            <a href="https://github.com/MustansirZia/next-express-bootstrap-boilerplate">
-              Github
-            </a>
-        </span>
-        <br />
-        <div className="btn">
-            <Link href="/profile">
-                <Button bsStyle="primary">Click Me</Button>
-            </Link>
-        </div>
-
-        {/* Styling using styled-jsx. */}
-        <style jsx>{`
-              .btn {
-                display: flex;
-                justify-content: center;
-              }`
-        }
-        </style>
-    </Theme>
-);
-
-export default Index;
-```
-<br />
-
-## Express integration.
-
-The backend routing is handled primarily inside `app.js`. There is where we initialize our express router. There is only app level middlewares at the moment (with a single route defined - `/main` in place). You can move the routing to a separate root folder like `routes` and use router level middlewares. <br />
-It should look quite familiar to the `app.js` of a normal express app with the exception of the asynchronous `next(app)` function call. This bootstraps Next.js with our express server and adds two middlewares to our existing router. <br />
-The first middleware adds `req.app` and `req.handle` properties to our `req` object. We can use these to render pages from Next.js inside our express routes. <br />
-The second middleware simply makes sure to divert any request comes to a route that is not defined within our express routes to the Next.js' handler which takes care of it automatically by looking up inside `app/pages` for a corresponding component. (This is why a request to `/` and `/profile` is catered to even though it is not defined in the express router; Only `/main` is defined there). <br />
-Thus, as you can see requests to `/main` and `/` mean the same thing. Each component is rendered on the server and then sent to the client. <br />
-Static files like icons or fonts are served from `public/` and an asset such as those can be reached on the url `/` such as `/icons/github.png`. <br />
-Look inside `app.js` and `next.js` to know more.
-
-#### `app.js`.
-```js
-const express = require('express');
-// const logger = require('morgan');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const next = require('./next');
-
-const app = express();
-// Put in place textbook middlewares for express.
-if (process.env.NODE_ENV !== 'production') {
-    // app.use(logger('dev'));
+*prismic-configuration.json*
+```json
+{
+	"apiEndpoint": "https://your-repo-name.cdn.prismic.io/api/v2",
+	"accessToken": "123456789"
 }
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use('/', express.static(path.join(__dirname, 'public')));
+```
+## How to create a Prismic client
+The Prismic client is a JavaScript object coming from the library `prismic-javascript` that helps you build queries to retrieve your content from your Prismic API.
+It provides multiple ways to retrieve it, [by custom type](#https://prismic.io/docs/reactjs/query-the-api/query-single-type-document), [by a specific UID](#https://prismic.io/docs/reactjs/query-the-api/query-by-id-or-uid), [by multiple predicates](#https://prismic.io/docs/reactjs/query-the-api/use-multiple-predicates) etc.
 
-const start = async (port) => {
-    // Couple Next.js with our express server.
-    // app and handle from "next" will now be available as req.app and req.handle.
-    await next(app);
+### A client for server side rendering
+First we're gonna create a module to export the Prismic client.
+For the server side, we'll need to provide the `request` object to the Prismic client so we can get cookies for [the Prismic preview](#setup-the-prismic-preview).
 
-    // Normal routing, if you need it.
-    // Use your SSR logic here.
-    // Even if you don't do explicit routing the pages inside app/pages
-    // will still get rendered as per their normal route.
-    app.get('/main', (req, res) => req.app.render(req, res, '/', {
-        routeParam: req.params.routeParam
-    }));
+**Instantiate the client:**
 
-    app.listen(port);
-};
-
-// Start the express server.
-start(9001);
+*prismic.js*
+```javascript
+import  PrismicLib  from  'prismic-javascript'
+import  PrismicConfig  from  './prismic-configuration.json'
+let  frontClient
+export  const  Client  = (req  =  null) => {
+	if(!req  &&  frontClient) return  frontClient  //prevent generate new instance for client side since we don't need the refreshed request object.
+	else {
+		const  options  =  Object.assign({}, req  ? {req} : {}, PrismicConfig.accessToken  ? {accessToken:  PrismicConfig.accessToken} : {})
+	return  Prismic.client(PrismicConfig.apiEndpoint, options)
+	}
+}
 ```
 
-<br />
+## Link Resolving
+Another major concept in Prismic is the link resolver. It helps you resolve the url of a Prismic document.
+It's useful for [the Prismic preview](#setup-the-prismic-preview) but also when you have a link from one document to another.
+The API is going to return all the metadata of the linked document and your link resolver will be able to convert this to a url for your website.
 
-## Goodies.
-### Hot loading.  <br />
-(For dev environment) <br />
+In the following code snippet, we are going to export the link resolver in the same module above:
 
-<p>
+*prismic.js*
 
-Hot loading is automatically added for any change inside `app` by Next.js which hot loads components as you change them. (This includes any css scss files)
+```javascript
+export  const  linkResolver  =  doc  => {
+	if (doc.type  ===  'homepage') return  '/'
+	else if (doc.type  ===  'products') return  '/products'
+	else if (doc.type  ===  'product') return  '/products/'  +  doc.uid
+	else if (doc.type  ===  'blog_home') return  '/blog'
+	else if (doc.type  ===  'blog_post') return  '/blog/'  +  doc.uid
+	else return  '/'
+}
+```
+## How to manage a dynamic routing
+For this article we are assuming that you have built a simple Next.js application with the default behavior, based on the `pages` folder.
 
-</p>
+Now that we have configured a client for Prismic, we need to configure the dynamic routing in your application.
+Prismic includes a special content field called, `UID`. This field is a unique and customizable identifier each document of a given `Custom Type`.
+The `UID` is used mainly for urls which is why we are going to dynamically match the `UID` on the route level so we can query the content accordingly.
 
-<p>
+### Build your router
+First, we are gonna build a simple router to match our different urls with the help of `next-routes`.
+You can refer to the [installation guide for `next-routes`](#installation) to help you get started with this.
 
-Hot loading for any server side code is handled by `nodemon` which restarts the node server automatically.
+**Configure your router:**
 
-</p>
+The router from Express allows you to extract a dynamic parameter from the url with the following syntax:
+``` :your-parameter```.
+So in the example below, if we navigate to the url `mywebsite.com/products/coffee-from-kenya`, the router will match `coffee-from-kenya` and provide it as the parameter `uid`.
 
-### Linting.  <br />
+*routes.js*
+```javascript
+const  routes  =  require('next-routes')
+module.exports  =  routes()
+.add('index', '/')
+.add('products', '/products')
+.add('product', '/products/:uid')
+.add('bloghome', '/blog')
+.add('blogpost', '/blog/:uid')
+.add('notfound', '/*')
+```
 
-<p>
+Each route in the example above will get its content from Prismic. This means that each route is related to a Prismic document. To resolve a page's url based on a Prismic document, you can refer to [the configuration of a link resolver](#link-resolving) section.
 
-Eslint is also added which uses the [airbnb](https://github.com/airbnb/javascript) style guide. Custom rules are defined to suit this very boilerplate inside `package.json` via a key called `eslintConfig`.
+### Build your server
+Now that our router is configured, we are going to build a simple server. Next.js embed a helper to set up an Express server in a few lines of code.
+You can refer to the [installation guide for `Express`](#installation) to help you get started with this.
 
-</p>
+**Setup the server:**
+*server.js*
+```javascript
+const  next  =  require("next")
+const  helmet  =  require('helmet')
+const  routes  =  require("./routes")
+const  app  =  next({ dev:  process.env.NODE_ENV  !==  "production" })
+const  handler  =  routes.getRequestHandler(app)
+const  express  =  require("express")
 
-<br />
+app.prepare().then(() => {
+	express()
+	.use(handler)
+	.use(helmet())
+	.listen(3000, () =>  process.stdout.write(`Point your browser to: http://localhost:3000\n`))
+})
+```
 
-## Compatibility.
-This boilerplate uses `react ^16.6.3` and `react-dom ^16.6.3`.
+### Update your build configuration
+Typically, if you start a Next.js application, you use the command `next start`.
+By using a custom server configuration, you need to update your configuration in `package.json`:
 
-Also, it should be okay with node version >= `8.12.0`. Sinice I've used `async/await`, for older versions I would recommend building with babel with the help of a plugin called `transform-runtime`.
+```json
+"scripts": {
+	"dev": "node server.js",
+	"build": "next build",
+	"start": "NODE_ENV=production node server.js"
+}
+```
+### How to use a dynamic route parameter in a component
+Everything is now setup. Let's take a look at a quick example that shows how to get a dynamic parameter from your routing system.
 
+In [the router section above](#build-your-router), we created a route `/products/:uid` linked to the component `Product` in our application.
+As soon as you navigate to a url with this pattern, you will instantiate the component `product` which is going to receive the dynamic parameter in a variable `uid`.
+Here's how to get this `uid` parameter:
 
-## Further reading.
-• [Learnnextjs.com.](https://learnnextjs.com/) <br />
-• [Next.js blog.](https://zeit.co/blog/next4)
+*product.js*
+```javascript
+import  React  from  'react'
 
+class Product extends  React.Component {
+	static  async  getInitialProps({ req, query }) {
+		console.log(query.uid)
+	}
+	render() { ... }
+}
+```
 
-## Contributions.
-PRs are quite welcome! :)
+When you configure `next-routes`, the `query` object is injected in any component linked to a route. It contains all the dynamic parameters configured in your url.
+You are now able to use it in any way you want. For example, you can use it to query your content from Prismic.
 
-## LICENSE.
-• [MIT.](https://github.com/MustansirZia/next-express-bootstrap-boilerplate/blob/master/LICENSE)
+## How to query your content from Prismic
+
+The Prismic client contains a few helpers to get your content. For example, you can retrieve a single document, a list of documents, a document based on its UID, etc.
+Let's discover this with a basic example that gets a product from the `UID` that we get dynamically from our routing system:
+
+*product.js*
+```javascript
+import  React  from  'react'
+import { Client } from  './prismic'
+
+export  default  class  extends  React.Component {
+
+	static  async  getInitialProps({ req, query }) {
+		try {
+			const  product  =  await  Client(req).getByUID('product', query.uid)
+			return { product }
+		} catch(error) {
+			return { error }
+		}
+	}
+
+	render() {
+		return <div>{this.props.product.id}</div>
+	}
+}
+```
+
+If you want to know more about querying Prismic, you can refer to [
+the official Prismic documentation for React](https://prismic.io/docs/reactjs/query-the-api/how-to-query-the-api).
+
+## How to integrate your content in your templates
+Now that you have your content, what's left to do is to render it.
+Let's take a basic example with a couple of Rich Text fields (styled text fields in Prismic) and an Image field.
+
+First let's you need to install `prismic-reactjs`. You can refer to the [installation guide for `reactjs`](#installation).
+
+*products.js*
+```javascript
+import  React  from  'react'
+import  {RichText, Date, Link}  from  'prismic-reactjs'
+import { Client, linkResolver } from  './prismic'
+
+export  default  class  extends  React.Component {
+
+	static  async  getInitialProps({ req, query }) {
+		try {
+			const  product  =  await  Client(req).getByUID('product', query.uid)
+			return { product }
+		} catch(error) {
+			return { error }
+		}
+	}
+
+	render() {
+		return (
+			<div>
+				{RichText.render(this.props.product.data.product_name, linkResolver)}
+				{RichText.render(this.props.product.data.product_description, linkResolver)}
+				<img src={this.props.product.data.product_illustration.url} />
+			</div>
+		)
+	}
+}
+```
+
+If you want to know more about Prismic integration in your templates, you can refer to [the official Prismic documentation for React](https://prismic.io/docs/reactjs/rendering/rich-text).
+
+## Setup the Prismic preview
+The Prismic preview allows you to write a draft on Prismic and preview it on your website without publishing it. It's useful to see your content in place without having to publish and make it available to all your users.
+The preview can also be shared with anybody using a generated link.
+If you want to know more about the preview, you can refer to [the official documentation about the preview](https://prismic.io/docs/nodejs/beyond-the-api/in-website-preview).
+For this you can rely on the Node.js documentation which is also based on Express.
+
+## Want more?
+
+If you didn't get enough with this little tutorial, you can find well detailed articles about SEO, preview, server side rendering and more on [Gary Meehan's website](https://www.garymeehan.ie).
