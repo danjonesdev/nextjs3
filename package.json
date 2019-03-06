@@ -7,7 +7,7 @@
     "dev": "node index.js",
     "build": "npx next build",
     "postinstall": "npm run build",
-    "start": "cross-env NODE_ENV=production node index.js",
+    "start": "npm run build && cross-env NODE_ENV=production node index.js",
     "export": "npx next export"
   },
   "author": "arnaudlewis",
