@@ -1,28 +1,35 @@
 import React from 'react'
+import axios from 'axios'
 import NotFound from './notfound'
 import Layout from './layout'
 
 export default class extends React.Component {
-  static async getInitialProps({ req, query }) {
-    try {
-      return query
-    } catch(error) {
-      return { error: true }
-    }
+
+static async getInitialProps() {
+    const res = await axios.get('https://jsonplaceholder.typicode.com/posts');
+    return {isLoaded: true, items: res.data}
   }
 
   renderBody() {
-    return (
-      <Layout title="{this.props.blogpost.data.meta_title}" description="{this.props.blogpost.data.meta_description}" layout="{this.props.layout}">
-        <article className="blog-post-article">
-          blog post: {this.props.uid}
-        </article>
-      </Layout>
-    )
+    const { error, isLoaded, items } = this.props;
+    if (error) {
+      return <div>Error: {error.message}</div>;
+    } else if (!isLoaded) {
+      return <div>Loading</div>;
+    } else {
+      return (
+        <ul>
+          {items.map(item => (
+            <li key={item.title}>
+              {item.title} {item.title}
+            </li>
+          ))}
+        </ul>
+      );
+    }
   }
 
   render() {
-    if(this.props.error) return <Layout layout="{this.props.layout}"><NotFound msg="this article doesn't exists." /></Layout>
-    else return this.renderBody()
+    return this.renderBody()
   }
 }
