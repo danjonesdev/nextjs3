@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@zeit/next-sass": "^1.0.2-canary.2",
+    "axios": "^0.18.0",
     "cookie": "^0.3.1",
     "cross-env": "^5.2.0",
     "express": "^4.16.4",

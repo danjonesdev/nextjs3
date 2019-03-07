@@ -1,19 +1,22 @@
-import React from 'react'
-import axios from 'axios'
-import NotFound from './notfound'
-import Layout from './layout'
+import React from "react";
+import axios from "axios";
+import NotFound from "./notfound";
+import Layout from "./layout";
 
 export default class extends React.Component {
-
-static async getInitialProps() {
-    const res = await axios.get('https://jsonplaceholder.typicode.com/posts');
-    return {isLoaded: true, items: res.data}
+  static async getInitialProps() {
+    try {
+      const res = await axios.get("https://jsonplaceholder.typicode.com/posts");
+      return { isLoaded: true, items: res.data };
+    } catch (error) {
+      return { isLoaded: true, error: error.message };
+    }
   }
 
   renderBody() {
     const { error, isLoaded, items } = this.props;
     if (error) {
-      return <div>Error: {error.message}</div>;
+      return <div>Error: {error}</div>;
     } else if (!isLoaded) {
       return <div>Loading</div>;
     } else {
@@ -30,6 +33,6 @@ static async getInitialProps() {
   }
 
   render() {
-    return this.renderBody()
+    return this.renderBody();
   }
 }
