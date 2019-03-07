@@ -3,18 +3,16 @@ import axios from "axios";
 import NotFound from "./notfound";
 import Layout from "./layout";
 
+import sanityHandle from "../actions/sanityHandle";
+
 export default class extends React.Component {
   static async getInitialProps() {
-    try {
-      const res = await axios.get("https://jsonplaceholder.typicode.com/posts");
-      return { isLoaded: true, items: res.data };
-    } catch (error) {
-      return { isLoaded: true, error: error.message };
-    }
+    return sanityHandle("https://jsonplaceholder.typicode.com/posts");
   }
 
-  renderBody() {
+  render() {
     const { error, isLoaded, items } = this.props;
+
     if (error) {
       return <div>Error: {error}</div>;
     } else if (!isLoaded) {
@@ -30,9 +28,5 @@ export default class extends React.Component {
         </ul>
       );
     }
-  }
-
-  render() {
-    return this.renderBody();
   }
 }
